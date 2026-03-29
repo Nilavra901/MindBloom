@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta http-equiv="Permissions-Policy" content="camera=*"/>
+  <title>MindBloom — Nurture Your Mind</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <!-- TensorFlow.js — powers the CNN emotion detection model -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js"></script>
+  <!-- MindBloom Styles -->
+  <link rel="stylesheet" href="css/styles.css"/>
+</head>
+<body>
+<div id="app">
+
+<div class="nav" id="main-nav" style="display:none">
+  <div class="navlogo">🌿 MindBloom</div>
+  <div class="navr">
+    <button class="ttog" onclick="togTheme()" id="theme-btn">🌙 Dark</button>
+    <button class="signout" onclick="doSignOut()">↪ Sign out</button>
+  </div>
+</div>
+
+<!-- LANDING -->
+<div id="s-land" class="scr on">
+  <div style="max-width:900px;margin:0 auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 24px">
+      <div class="navlogo">🌿 MindBloom</div>
+      <div style="display:flex;gap:8px">
+        <button class="ttog" onclick="togTheme()" id="land-theme-btn">🌙</button>
+        <button class="btn-g" style="padding:8px 18px;font-size:13px" onclick="go('auth',false)">Sign in</button>
+        <button class="btn-p" style="padding:8px 18px;font-size:13px" onclick="go('auth',true)">Start free</button>
+      </div>
+    </div>
+    <div class="hero">
+      <div style="display:inline-flex;align-items:center;gap:6px;background:var(--dw);color:var(--fo);padding:5px 13px;border-radius:18px;font-size:11px;font-weight:500;margin-bottom:20px;border:1px solid rgba(74,124,89,.2)">✦ Your private wellness sanctuary</div>
+      <h1>Nurture Your Mind,<br><em>one entry at a time</em></h1>
+      <p>A calm, AI-powered journaling space that helps you understand your emotional patterns and celebrate your growth.</p>
+      <div class="hcta">
+        <button class="btn-p" onclick="go('auth',true)">Begin your journey</button>
+        <button class="btn-g" onclick="go('dash-direct')">See the dashboard</button>
+      </div>
+      <div class="trust">
+        <div class="tbdg">🔒 Private &amp; Secure</div>
+        <div class="tbdg">✨ AI-Powered Insights</div>
+        <div class="tbdg">📈 Track Progress</div>
+      </div>
+    </div>
+    <div class="feats">
+      <div class="fcard"><div class="fico">📝</div><h3>Journal Freely</h3><p>Write or speak your thoughts. Text and voice entries, always private.</p></div>
+      <div class="fcard"><div class="fico">📊</div><h3>Understand Patterns</h3><p>AI sentiment reveals emotional trends across days and weeks.</p></div>
+      <div class="fcard"><div class="fico">🤝</div><h3>Gentle Support</h3><p>Kind nudges toward helpful resources when moods trend downward.</p></div>
+    </div>
+    <div class="ctabox"><div class="ctain">
+      <h2>Your mind deserves a garden</h2>
+      <p>Free to start, always compassionate.</p>
+      <button onclick="go('auth',true)">Plant your first entry →</button>
+    </div></div>
+    <footer><strong>MindBloom</strong> is a wellness tool, not a substitute for professional mental health care. © 2026 MindBloom</footer>
+  </div>
+</div>
+
+<!-- AUTH -->
+<div id="s-auth" class="scr">
+  <div class="awrap"><div class="acard">
+    <h2 id="atit">Welcome back</h2>
+    <p class="asub-t" id="a-sub">Sign in to your MindBloom journal</p>
+    <div id="aerr" class="aerr"></div>
+    <div class="fg"><label class="flbl">Email address</label><input class="ainp" id="a-em" type="email" placeholder="you@example.com"></div>
+    <div class="fg"><label class="flbl">Password</label><input class="ainp" id="a-pw" type="password" placeholder="••••••••"></div>
+    <div id="a-name-f" class="fg" style="display:none"><label class="flbl">Display name</label><input class="ainp" id="a-nm" type="text" placeholder="Your first name"></div>
+    <div id="a-emg-f" class="fg" style="display:none">
+      <label class="flbl">Emergency contact number</label>
+      <input class="ainp" id="a-emg" type="tel" placeholder="+91 9152987821 or any trusted number">
+      <div class="emg-note">💚 This number will only be shown to you if we detect you may need urgent support. It stays completely private.</div>
+    </div>
+    <button class="asub-btn" id="a-btn" onclick="doAuth()">Sign in</button>
+    <div id="a-forgot-row" style="text-align:right;margin-top:8px;margin-bottom:2px">
+      <span style="font-size:11px;color:var(--s);cursor:pointer" onclick="showForgot()">Forgot password?</span>
+    </div>
+    <div class="atog"><span id="a-sw-txt">No account?</span> <span onclick="togAuth()"><span id="a-sw-lnk">Create one</span></span></div>
+    <p style="text-align:center;margin-top:12px;font-size:11px;color:var(--ts)">Or <span style="color:var(--s);cursor:pointer" onclick="go('land')">← back to home</span></p>
+  </div></div>
+</div>
+
+<!-- FORGOT PASSWORD OVERLAY -->
+<div id="s-forgot" class="scr">
+  <div class="awrap"><div class="acard">
+    <div id="fp-step1">
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:500;margin-bottom:4px;color:var(--tx)">Recover your account</h2>
+      <p class="asub-t">Enter the email address you signed up with</p>
+      <div id="fp-err" class="aerr"></div>
+      <div class="fg"><label class="flbl">Email address</label><input class="ainp" id="fp-em" type="email" placeholder="you@example.com"></div>
+      <button class="asub-btn" onclick="sendVerification()">Send verification code</button>
+      <p style="text-align:center;margin-top:12px;font-size:11px;color:var(--ts)"><span style="color:var(--s);cursor:pointer" onclick="cancelForgot()">← Back to sign in</span></p>
+    </div>
+    <div id="fp-step2" style="display:none">
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:500;margin-bottom:4px;color:var(--tx)">Enter verification code</h2>
+      <p class="asub-t" id="fp-code-sub">We've sent a 6-digit code to your email</p>
+      <div id="fp-err2" class="aerr"></div>
+      <div class="fg">
+        <label class="flbl">Verification code</label>
+        <input class="ainp" id="fp-code" type="text" maxlength="6" placeholder="_ _ _ _ _ _" style="letter-spacing:.25em;font-size:18px;text-align:center">
+        <div style="text-align:right;margin-top:6px"><span style="font-size:11px;color:var(--ts)">Didn't get it? <span style="color:var(--s);cursor:pointer" id="fp-resend-link" onclick="resendCode()">Resend code</span></span></div>
+      </div>
+      <button class="asub-btn" onclick="verifyCode()">Verify</button>
+      <p style="text-align:center;margin-top:12px;font-size:11px;color:var(--ts)"><span style="color:var(--s);cursor:pointer" onclick="cancelForgot()">← Back to sign in</span></p>
+    </div>
+    <div id="fp-step3" style="display:none">
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:500;margin-bottom:4px;color:var(--tx)">Set new password</h2>
+      <p class="asub-t">Choose a new password for your account</p>
+      <div id="fp-err3" class="aerr"></div>
+      <div class="fg">
+        <label class="flbl">New password</label>
+        <input class="ainp" id="fp-pw1" type="password" placeholder="At least 6 characters">
+      </div>
+      <div class="fg">
+        <label class="flbl">Confirm new password</label>
+        <input class="ainp" id="fp-pw2" type="password" placeholder="Repeat your password">
+      </div>
+      <button class="asub-btn" onclick="resetPassword()">Reset password & sign in</button>
+    </div>
+  </div></div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="s-dash" class="scr">
+  <div class="dlayout">
+    <aside class="sbar">
+      <div style="padding:4px 6px 6px;font-size:16px;font-weight:500;color:var(--tx);margin-bottom:2px">🌿 MindBloom</div>
+      <div class="susr">Signed in as <strong id="s-usr">you</strong></div>
+      <div class="snav">
+        <button class="sit act" id="nt-home" onclick="dtab(this,'home')">🏠 Home</button>
+        <button class="sit" id="nt-insights" onclick="dtab(this,'insights')">📊 Insights</button>
+        <button class="sit" id="nt-entries" onclick="dtab(this,'entries')">📚 Journal</button>
+        <button class="sit" id="nt-emotion" onclick="dtab(this,'emotion')" style="position:relative">
+          📷 Emotion Scan
+          <span style="position:absolute;top:6px;right:8px;background:#4a7c59;color:#fff;font-size:9px;padding:1px 5px;border-radius:6px;font-weight:600;letter-spacing:.03em">LIVE</span>
+        </button>
+        <button class="sit" id="nt-settings" onclick="dtab(this,'settings')">⚙️ Settings</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:3px;margin-top:auto">
+        <button class="sit" onclick="togTheme()">🌙 Theme</button>
+        <button class="sit" onclick="doSignOut()">← Sign out</button>
+      </div>
+    </aside>
+    <main class="dmain">
+
+      <!-- HOME TAB -->
+      <div id="dt-home">
+        <div class="greet-h" id="greet-el">Good evening 🌿</div>
+        <div id="date-el" style="display:flex;align-items:center;gap:10px;margin-bottom:24px;flex-wrap:wrap">
+          <span id="date-text" style="font-size:13px;color:var(--ts)"></span>
+          <span style="width:1px;height:12px;background:var(--bdr);display:inline-block"></span>
+          <span id="clock-el" style="font-size:13px;color:var(--s);font-weight:500;font-variant-numeric:tabular-nums"></span>
+        </div>
+        <div id="crit-alert" style="display:none">
+          <div class="tip-card tip-crit" style="margin-bottom:18px">
+            <div class="tip-title">🆘 We're concerned about you</div>
+            <p>Your recent mood scores suggest you may be going through a very difficult time. You are not alone. Please reach out to your emergency contact or a crisis helpline right now.</p>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px">
+              <a id="emg-call-btn" class="emg-call" href="#">📞 Call your emergency contact</a>
+              <a id="emg-sms-btn" class="emg-call" href="#" style="background:#2d5a3d">💬 Text your emergency contact</a>
+            </div>
+            <div style="margin-top:8px;font-size:11px;color:var(--ts)">India: iCall <strong>9152987821</strong> · International: <strong>findahelpline.com</strong></div>
+          </div>
+        </div>
+        <div class="comp-card">
+          <h3>How are you feeling?</h3>
+          <textarea class="jta" id="jtxt" placeholder="Write about your day, thoughts, or feelings…" rows="5"
+            onfocus="this.style.borderColor='var(--s)'" onblur="this.style.borderColor='var(--bdr)'"></textarea>
+          <div id="vstrip" class="voice-strip"></div>
+          <div class="aith" id="aith"><span>Analysing your entry</span><span class="dpul"><span></span><span></span><span></span></span></div>
+          <div class="comp-foot">
+            <div style="display:flex;align-items:center;gap:8px">
+            <button class="mic-btn" id="mic-btn" onclick="togRec()" title="Voice entry" style="position:relative;overflow:visible">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="2" width="6" height="12" rx="3"/>
+                <path d="M5 10a7 7 0 0 0 14 0"/>
+                <line x1="12" y1="19" x2="12" y2="22"/>
+                <line x1="8" y1="22" x2="16" y2="22"/>
+              </svg>
+              <span id="rec-dot" style="display:none;position:absolute;top:-3px;right:-3px;width:9px;height:9px;border-radius:50%;background:#c0392b;animation:blink .8s infinite"></span>
+            </button>
+            <button class="cam-btn" id="cam-btn" onclick="openCamModal()" title="Detect emotion via camera">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                <circle cx="12" cy="13" r="4"/>
+              </svg>
+            </button>
+            </div>
+            <button class="save-btn" onclick="doSave()">➤ Save Entry</button>
+          </div>
+          <div class="fer-detected-strip" id="fer-strip">
+            <span id="fer-strip-icon" style="font-size:20px"></span>
+            <span id="fer-strip-text"></span>
+          </div>
+        </div>
+        <div id="mresult" style="display:none">
+          <div class="mcard" id="mcard-inner">
+            <div>
+              <div id="m-emoji" style="font-size:36px;line-height:1;margin-bottom:6px">😊</div>
+              <div class="mcard-score" id="m-score">5.0</div>
+              <div class="mcard-lbl" id="m-lbl">Neutral — a fresh start</div>
+              <div class="mcard-themes" id="m-themes"></div>
+            </div>
+            <div style="text-align:right"><div style="font-size:10px;opacity:.65;letter-spacing:.08em">MOOD SCORE</div><div style="font-size:12px;opacity:.7;margin-top:2px">out of 10</div></div>
+          </div>
+        </div>
+        <div id="tip-card" style="display:none">
+          <div class="tip-card" id="tip-inner">
+            <div class="tip-title" id="tip-title"></div>
+            <p id="tip-body"></p>
+          </div>
+        </div>
+        <div class="chart-card">
+          <h4>Mood Trend</h4>
+          <svg class="mood-chart" id="home-chart" viewBox="0 0 600 200" preserveAspectRatio="none"></svg>
+          <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--ts);margin-top:6px;padding:0 4px" id="home-chart-labels"></div>
+        </div>
+      </div>
+
+      <!-- INSIGHTS TAB -->
+      <div id="dt-insights" style="display:none">
+        <div class="greet-h" style="margin-bottom:4px">Your emotional landscape</div>
+        <div class="greet-s">Patterns from your recent entries</div>
+        <div class="sg">
+          <div class="scrd"><div class="slbl">Avg mood score</div><div class="sval" id="ins-avg">5.0</div><div class="schg" id="ins-trend">— baseline</div></div>
+          <div class="scrd"><div class="slbl">Entries this month</div><div class="sval" id="ins-cnt">0</div><div class="schg" id="ins-streak"></div></div>
+        </div>
+        <div class="chart-card">
+          <h4>Mood Trend</h4>
+          <svg class="mood-chart" id="ins-chart" viewBox="0 0 600 200" preserveAspectRatio="none"></svg>
+          <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--ts);margin-top:6px;padding:0 4px" id="ins-chart-labels"></div>
+        </div>
+        <div class="chart-card"><h4>Top themes</h4><div id="ins-themes" style="display:flex;flex-wrap:wrap;gap:7px;margin-top:4px"></div></div>
+      </div>
+
+      <!-- JOURNAL TAB -->
+      <div id="dt-entries" style="display:none">
+        <div class="greet-h" style="margin-bottom:4px">Journal entries</div>
+        <div class="greet-s" style="margin-bottom:4px">Your full history — private and secure</div>
+        <!-- Search + filter bar -->
+        <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center">
+          <div style="position:relative;flex:1;min-width:180px">
+            <span style="position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--ts)">🔍</span>
+            <input id="journal-search" type="text" placeholder="Search entries…"
+              style="width:100%;padding:9px 12px 9px 32px;border-radius:9px;border:1px solid var(--bdr);background:var(--card);color:var(--tx);font-family:'DM Sans',sans-serif;font-size:13px;outline:none"
+              oninput="filterEntries()" onfocus="this.style.borderColor='var(--s)'" onblur="this.style.borderColor='var(--bdr)'">
+          </div>
+          <select id="journal-filter" onchange="filterEntries()"
+            style="padding:9px 12px;border-radius:9px;border:1px solid var(--bdr);background:var(--card);color:var(--tx);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;cursor:pointer">
+            <option value="all">All moods</option>
+            <option value="high">😊 High (7+)</option>
+            <option value="mid">😐 Medium (4–7)</option>
+            <option value="low">😔 Low (below 4)</option>
+          </select>
+        </div>
+        <!-- Entry count -->
+        <div id="journal-count" style="font-size:11px;color:var(--ts);margin-bottom:12px"></div>
+        <!-- Entries list — full text, expandable -->
+        <div id="elist">
+          <div class="eitem"><div class="embdg ebdg-hi">8.1</div>
+            <div style="flex:1">
+              <div class="ettl">Morning reflection</div>
+              <div class="etxt-full" style="font-size:13px;color:var(--tm);line-height:1.65;margin:3px 0 5px">Woke up feeling genuinely grateful today. The light through the window reminded me of simpler mornings...</div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+                <span class="emta">Mar 16 · Text · 😊 Positive</span>
+                <span style="background:rgba(74,124,89,.1);color:var(--fo);padding:2px 8px;border-radius:10px;font-size:10px">Gratitude</span>
+                <span style="background:rgba(74,124,89,.1);color:var(--fo);padding:2px 8px;border-radius:10px;font-size:10px">Morning</span>
+              </div>
+            </div>
+          </div>
+          <div class="eitem"><div class="embdg ebdg-low">4.2</div>
+            <div style="flex:1">
+              <div class="ettl">Difficult afternoon</div>
+              <div class="etxt-full" style="font-size:13px;color:var(--tm);line-height:1.65;margin:3px 0 5px">The meeting went sideways. I felt unheard and that familiar tightness returned in my chest. Not sure how to move forward.</div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+                <span class="emta">Mar 14 · Voice · 😔 Low mood</span>
+                <span style="background:rgba(192,57,43,.1);color:#922b21;padding:2px 8px;border-radius:10px;font-size:10px">Stress</span>
+                <span style="background:rgba(192,57,43,.1);color:#922b21;padding:2px 8px;border-radius:10px;font-size:10px">Work</span>
+              </div>
+            </div>
+          </div>
+          <div class="eitem"><div class="embdg ebdg-hi">7.5</div>
+            <div style="flex:1">
+              <div class="ettl">Evening walk</div>
+              <div class="etxt-full" style="font-size:13px;color:var(--tm);line-height:1.65;margin:3px 0 5px">Took the long route home. Sometimes movement is the only answer my body understands. Felt lighter by the end.</div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+                <span class="emta">Mar 13 · Text · 🙂 Calm</span>
+                <span style="background:rgba(74,124,89,.1);color:var(--fo);padding:2px 8px;border-radius:10px;font-size:10px">Peace</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="journal-empty" style="display:none;text-align:center;padding:32px;color:var(--ts);font-size:13px">No entries match your search.</div>
+      </div>
+
+      <!-- LIVE EMOTION TAB -->
+      <div id="dt-emotion" style="display:none">
+        <div class="greet-h" style="margin-bottom:4px">📷 Live Emotion Detection</div>
+        <div class="greet-s" style="margin-bottom:20px">Your trained deep learning model detects emotions in real time</div>
+
+        <!-- Model status card -->
+        <div class="comp-card" style="margin-bottom:18px">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+            <div>
+              <div style="font-size:14px;font-weight:500;color:var(--tx);margin-bottom:4px">🧠 CNN Emotion Model</div>
+              <div style="font-size:12px;color:var(--ts)">Conv2D · 128→256→512→512 filters · 7 emotions · 48×48 grayscale</div>
+            </div>
+            <div id="em-model-status" style="display:flex;align-items:center;gap:6px;background:rgba(192,57,43,.1);border:1px solid rgba(192,57,43,.3);border-radius:20px;padding:5px 12px;font-size:12px;color:#c0392b">
+              <span style="width:7px;height:7px;border-radius:50%;background:#c0392b;display:inline-block"></span>
+              Model not loaded
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap">
+            <label style="flex:1;min-width:180px">
+              <div style="font-size:11px;color:var(--ts);margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em">Upload model weights (.h5 or .json)</div>
+              <input type="file" id="em-model-file" accept=".json,.h5" multiple
+                style="width:100%;padding:8px 10px;border:1px dashed var(--bdr);border-radius:8px;background:var(--cr);color:var(--tm);font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer"
+                onchange="handleModelUpload(this.files)">
+            </label>
+          </div>
+          <div id="em-model-log" style="margin-top:10px;font-size:11px;color:var(--ts);line-height:1.7;display:none"></div>
+        </div>
+
+        <!-- Camera card -->
+        <div class="comp-card" style="margin-bottom:18px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+            <h3 style="margin-bottom:0">Live Camera Feed</h3>
+            <div style="display:flex;gap:8px">
+              <button id="em-start-btn" onclick="startEmotionCam()"
+                style="background:var(--s);color:#fff;border:none;padding:9px 20px;border-radius:20px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:6px">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                Start Camera
+              </button>
+              <button id="em-stop-btn" onclick="stopEmotionCam()"
+                style="display:none;background:transparent;color:#c0392b;border:1.5px solid #c0392b;padding:9px 20px;border-radius:20px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer">
+                ⬛ Stop
+              </button>
+            </div>
+          </div>
+
+          <!-- Video area -->
+          <div style="position:relative;border-radius:14px;overflow:hidden;background:#0a0a0a;aspect-ratio:4/3;margin-bottom:14px" id="em-video-wrap">
+            <video id="em-video" autoplay playsinline muted
+              style="width:100%;height:100%;object-fit:cover;display:block;transform:scaleX(-1)"></video>
+            <canvas id="em-canvas"
+              style="position:absolute;inset:0;width:100%;height:100%;transform:scaleX(-1)"></canvas>
+            <!-- Placeholder when camera off -->
+            <div id="em-placeholder" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--ts)">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:.4"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              <span style="font-size:13px;opacity:.5">Camera is off — press Start Camera</span>
+            </div>
+            <!-- Live badge -->
+            <div id="em-live-badge" style="display:none;position:absolute;top:12px;left:12px;background:rgba(192,57,43,.9);color:#fff;padding:3px 10px;border-radius:10px;font-size:11px;font-weight:600;letter-spacing:.06em;display:none;align-items:center;gap:5px">
+              <span style="width:6px;height:6px;border-radius:50%;background:#fff;display:inline-block;animation:blink .8s infinite"></span> LIVE
+            </div>
+          </div>
+
+          <!-- Status bar -->
+          <div id="em-status" style="text-align:center;font-size:12px;color:var(--ts);min-height:18px;margin-bottom:14px">
+            Press Start Camera to begin
+          </div>
+
+          <!-- Emotion result badge -->
+          <div id="em-result-badge" style="display:none;background:var(--dw);border-radius:14px;padding:18px 20px;margin-bottom:14px">
+            <div style="display:flex;align-items:center;gap:14px">
+              <div id="em-res-emoji" style="font-size:48px;line-height:1">😐</div>
+              <div style="flex:1">
+                <div id="em-res-label" style="font-size:20px;font-weight:500;color:var(--tx);text-transform:capitalize;margin-bottom:2px">neutral</div>
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+                  <div style="flex:1;height:6px;background:var(--bdr);border-radius:3px;overflow:hidden">
+                    <div id="em-conf-bar" style="height:100%;background:var(--s);border-radius:3px;transition:width .4s;width:0%"></div>
+                  </div>
+                  <span id="em-res-conf" style="font-size:12px;color:var(--ts);min-width:36px">0%</span>
+                </div>
+                <div id="em-res-tip" style="font-size:12px;color:var(--tm);line-height:1.5"></div>
+              </div>
+            </div>
+            <!-- All emotion bars -->
+            <div id="em-all-bars" style="margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:6px 16px"></div>
+          </div>
+
+          <!-- Use in journal button -->
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button id="em-use-btn" onclick="useEmotionInJournal()" style="display:none;flex:1;background:var(--s);color:#fff;border:none;padding:11px;border-radius:22px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer">
+              ✍️ Use this emotion in Journal
+            </button>
+          </div>
+        </div>
+
+        <!-- Emotion history -->
+        <div class="comp-card">
+          <h3 style="margin-bottom:14px">Recent Detections</h3>
+          <div id="em-history" style="display:flex;flex-direction:column;gap:8px">
+            <div style="font-size:12px;color:var(--ts);text-align:center;padding:16px 0">No detections yet</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SETTINGS TAB -->
+      <div id="dt-settings" style="display:none">
+        <div class="greet-h" style="margin-bottom:4px">Settings</div>
+        <div class="greet-s" style="margin-bottom:18px">Manage your account</div>
+        <!-- Profile card -->
+        <div class="set-card" style="margin-bottom:14px">
+          <h3>👤 Your profile</h3>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px">
+            <div style="background:var(--bg);border-radius:8px;padding:10px 12px">
+              <div style="font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--ts);margin-bottom:4px">User ID</div>
+              <div id="prof-id" style="font-size:11px;color:var(--tx);word-break:break-all;font-family:monospace">—</div>
+            </div>
+            <div style="background:var(--bg);border-radius:8px;padding:10px 12px">
+              <div style="font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--ts);margin-bottom:4px">Email</div>
+              <div id="prof-email" style="font-size:11px;color:var(--tx);word-break:break-all">—</div>
+            </div>
+            <div style="background:var(--bg);border-radius:8px;padding:10px 12px">
+              <div style="font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--ts);margin-bottom:4px">Member since</div>
+              <div id="prof-since" style="font-size:12px;color:var(--tx)">—</div>
+            </div>
+            <div style="background:var(--bg);border-radius:8px;padding:10px 12px">
+              <div style="font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--ts);margin-bottom:4px">Last login</div>
+              <div id="prof-login" style="font-size:12px;color:var(--tx)">—</div>
+            </div>
+          </div>
+          <div style="margin-top:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <div style="flex:1">
+              <div style="font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--ts);margin-bottom:4px">Display name</div>
+              <div style="display:flex;gap:8px;align-items:center">
+                <input class="ainp" id="prof-name-inp" type="text" style="max-width:200px" placeholder="Your name">
+                <button onclick="saveDisplayName()" style="background:var(--s);color:#fff;border:none;padding:7px 14px;border-radius:18px;font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer">Save</button>
+                <span id="prof-name-ok" style="font-size:11px;color:var(--s);display:none">✅ Saved</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="set-card"><h3>Appearance</h3>
+          <div class="set-row"><label>Dark mode</label><label class="tog-sw"><input type="checkbox" id="dk-chk" onchange="togTheme()"><span class="sw-sl"></span></label></div>
+        </div>
+        <div class="set-card">
+          <h3>🆘 Emergency contact</h3>
+          <p style="font-size:12px;color:var(--ts);line-height:1.6;margin-bottom:14px">This number is shown to you — with a direct call and text button — whenever your mood score is critically low. Only you can see it.</p>
+          <div id="emg-display-row" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px">
+            <div style="display:flex;align-items:center;gap:8px;background:var(--dw);border-radius:9px;padding:10px 14px;flex:1;min-width:200px">
+              <span style="font-size:18px">📞</span>
+              <span id="emg-display-num" style="font-size:15px;font-weight:500;color:var(--tx);letter-spacing:.04em">9152987821</span>
+            </div>
+            <button onclick="startEditEmg()" id="emg-edit-btn" style="background:var(--s);color:#fff;border:none;padding:9px 18px;border-radius:22px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap">✏️ Change number</button>
+          </div>
+          <div id="emg-edit-row" style="display:none;gap:8px;flex-wrap:wrap;align-items:flex-start">
+            <div style="flex:1;min-width:200px">
+              <input class="ainp" id="emg-setting" type="tel" placeholder="+91 9152987821" style="width:100%"
+                onkeydown="if(event.key==='Enter') saveEmg()" oninput="clearEmgFeedback()">
+              <div id="emg-feedback" style="font-size:11px;margin-top:5px;min-height:16px"></div>
+            </div>
+            <div style="display:flex;gap:6px;margin-top:2px">
+              <button onclick="saveEmg()" style="background:var(--s);color:#fff;border:none;padding:9px 18px;border-radius:22px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer">Save</button>
+              <button onclick="cancelEditEmg()" style="background:transparent;color:var(--tm);border:1px solid var(--bdr);padding:9px 14px;border-radius:22px;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer">Cancel</button>
+            </div>
+          </div>
+        </div>
+        <div class="set-card"><h3>Privacy</h3><p style="font-size:12px;color:var(--ts);line-height:1.65">All entries are encrypted at rest. Only you can access your data. MindBloom never sells your information.</p></div>
+        <div style="background:rgba(192,57,43,.08);border:1px solid rgba(192,57,43,.2);border-radius:10px;padding:14px 16px;font-size:11px;color:var(--ts);line-height:1.7"><strong style="color:#c0392b">Mental health disclaimer:</strong> MindBloom is a wellness journaling tool, not a substitute for professional mental health care. If you are in crisis, please contact a licensed professional or call a helpline in your region.</div>
+      </div>
+
+    </main>
+  </div>
+</div>
+</div>
+
+<!-- ── MindBloom JavaScript Modules ────────────────────────────────── -->
+<!-- Database & Storage Engine -->
+<script src="js/db.js"></script>
+<!-- Authentication (sign up, sign in, forgot password) -->
+<script src="js/auth.js"></script>
+<!-- Navigation & Screen Routing -->
+<script src="js/navigation.js"></script>
+<!-- Dashboard, Tabs & Live Clock -->
+<script src="js/dashboard.js"></script>
+<!-- Journal, AI Sentiment & Voice Entry -->
+<script src="js/journal.js"></script>
+<!-- Mood Charts & Insights -->
+<script src="js/charts.js"></script>
+<!-- Settings & Emergency Contact -->
+<script src="js/settings.js"></script>
+<!-- Live Emotion Detection (CNN Model via TF.js) -->
+<script src="js/emotion.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,32 @@
+{
+  "name": "mindbloom",
+  "version": "1.0.0",
+  "description": "AI-powered mental wellness journal with live facial emotion detection",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve . -p 3000",
+    "dev": "npx live-server --port=3000 --open=index.html",
+    "lint": "node scripts/lint.js",
+    "convert-model": "python3 scripts/convert_model.py"
+  },
+  "keywords": [
+    "mental-health",
+    "wellness",
+    "journal",
+    "emotion-detection",
+    "tensorflow",
+    "deep-learning",
+    "cnn"
+  ],
+  "author": "Tuba Khan",
+  "license": "MIT",
+  "devDependencies": {
+    "live-server": "^1.2.2",
+    "serve": "^14.2.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/YOUR_USERNAME/mindbloom.git"
+  },
+  "homepage": "https://YOUR_USERNAME.github.io/mindbloom"
+}
