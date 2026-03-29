@@ -41,7 +41,7 @@ The system focuses on combining **AI interaction, memory tracking, and visualiza
 
 ### AI Integration
 
-* Gemini API / LLM-based responses
+* Optimized AI model with improved performance and reduced complexity 
 
 ---
 
